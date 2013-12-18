@@ -495,6 +495,10 @@ abstract class Kohana_Database {
 	 */
 	public function quote_column($column)
 	{
+
+                // Identifiers are escaped by repeating them
+                $escaped_identifier = $this->_identifier.$this->_identifier;
+                
 		if (is_array($column))
 		{
 			list($column, $alias) = $column;
@@ -515,15 +519,18 @@ abstract class Kohana_Database {
 			// Convert to a string
 			$column = (string) $column;
 
+                        $column = str_replace($this->_identifier, $escaped_identifier, $column);
+                        
 			if ($column === '*')
 			{
 				return $column;
 			}
-			elseif (strpos($column, '"') !== FALSE)
-			{
-				// Quote the column in FUNC("column") identifiers
-				$column = preg_replace('/"(.+?)"/e', '$this->quote_column("$1")', $column);
-			}
+//			elseif (strpos($column, '"') !== FALSE)
+//			{
+//				// Quote the column in FUNC("column") identifiers
+//				// preg_replace() is deprecated in PHP 5.5.x
+//				$column = preg_replace('/"(.+?)"/e', '$this->quote_column("$1")', $column);
+//			}
 			elseif (strpos($column, '.') !== FALSE)
 			{
 				$parts = explode('.', $column);
